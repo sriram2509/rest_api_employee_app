@@ -11,57 +11,80 @@ const EmpListing = () => {
         navigate("/employee/edit/" + bpartnerId);
     }
     const Deactivatefunction = (bpartnerId) => {
-        if (window.confirm('Do you want to Deactivate?')) {
-            fetch("http://45.32.99.72:8087/assignmentBE/deactivateEmployee", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                },
-                body: JSON.stringify({
-                    "clientId":101,
-                    "orgId":11,
-                    "userId":9,
-                    "bpartnerId": bpartnerId
-                })
-            }).then((res) => {
-                alert('Deactivate successfully.')
-                window.location.reload();
-            }).catch((err) => {
-                console.log(err.message)
-            })
-        }
-    }
+        // if (window.confirm('Do you want to Deactivate?')) {
+        //     fetch("http://45.32.99.72:8087/assignmentBE/deactivateEmployee", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-type": "application/json; charset=UTF-8"
+        //         },
+        //         body: JSON.stringify({
+        //             "clientId":101,
+        //             "orgId":11,
+        //             "userId":9,
+        //             "bpartnerId": bpartnerId
+        //         })
+        //     }).then((res) => {
+        //         alert('Deactivate successfully.')
+        //         window.location.reload();
+        //     }).catch((err) => {
+        //         console.log(err.message)
+        //     })
+        // }
 
-    // swal({
-    //     title: "Are you sure?",
-    //     text: "Once deleted, you will not be able to recover this imaginary file!",
-    //     icon: "warning",
-    //     buttons: true,
-    //     dangerMode: true,
-    //   })
-    //   .then((willDelete) => {
-    //     if (willDelete) {
-    //       swal("Poof! Your imaginary file has been deleted!", {
-    //         icon: "success",
-    //       });
-    //     } else {
-    //       swal("Your imaginary file is safe!");
-    //     }
-    //   });
-      
+        swal({
+            title: "Are you sure?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+
+                if (willDelete) {
+                    {
+                        fetch("http://45.32.99.72:8087/assignmentBE/deactivateEmployee", {
+                            method: "POST",
+                            headers: {
+                                "Content-type": "application/json; charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                "clientId": 101,
+                                "orgId": 11,
+                                "userId": 9,
+                                "bpartnerId": bpartnerId
+                            })
+                        }).then((res) => {
+                            // alert('Deactivate successfully.')
+                            window.location.reload();
+                        }).catch((err) => {
+                            console.log(err.message)
+                        })
+                    }
+                    swal("deactivated successfully.....!!", {
+                        icon: "success",
+                    });
+                } else {
+                    swal("Active..!");
+                }
+            });
+    };
+
+
+
 
 
     useEffect(() => {
-        fetch("http://45.32.99.72:8087/assignmentBE/viewEmployee",{
+        fetch("http://45.32.99.72:8087/assignmentBE/viewEmployee", {
             method: "POST",
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
             },
             body: JSON.stringify({
-                "clientId":101,
-                "orgId":101,
-                "userId":9})
-        }).then((res) => 
+                "clientId": 101,
+                "orgId": 101,
+                "userId": 9
+            })
+        }).then((res) =>
             res.json()
         ).then((resp) => {
             console.log(resp);
@@ -94,13 +117,13 @@ const EmpListing = () => {
                         <tbody>
 
                             {empdata &&
-                                empdata.map((item ,index)=> (
+                                empdata.map((item, index) => (
                                     <tr key={index}>
                                         <td>{item.bpartnerId}</td>
                                         <td>{item.firstName}</td>
                                         <td>{item.lastName}</td>
                                         <td>{item.designationName}</td>
-                                        <td>{item.isActive ? <input type="checkbox" checked={true}/> : <input type="checkbox" checked={false}/> }</td>
+                                        <td>{item.isActive ? <input type="checkbox" checked={true} /> : <input type="checkbox" checked={false} />}</td>
                                         <td><Link to={"employee/edit/" + item.bpartnerId} className="btn btn-success">Edit</Link>
                                             <Link onClick={() => { Deactivatefunction(item.bpartnerId) }} className="btn btn-danger">Deactivate</Link>
                                         </td>

@@ -25,6 +25,15 @@ const EmpCreate = () => {
   const [description, descriptionchange] = useState("");
   const [remark, remarkschange] = useState("");
   const [isActive, activechange] = useState(true);
+  
+
+
+
+  const [imageData, setImageData] = useState({
+    profilePicture: "",//base64,
+    isProfilePictureChange: false,//boolean
+    profilePictureNameExtension: ""//image ext,
+})
 
   // dropdown values
   const [countryList, setCountryList] = useState([]);
@@ -374,21 +383,18 @@ const EmpCreate = () => {
         address,
         countryId,
         cityId,
-        profilePicture,
-        isProfilePictureChange,
-        profilePictureNameExtension,
         description,
         remark,
         isActive,
       };
 
-
+    
 
       fetch("http://45.32.99.72:8087/assignmentBE/checkEmployeeExist", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          "clientId": 1,
+          "clientId": 101,
           "bpartnerId": parseInt(empdata.bpartnerId),
           "nicNo": empdata.nicNo
         }),
@@ -408,7 +414,7 @@ const EmpCreate = () => {
             body: JSON.stringify({
               "clientId": 101,
               "orgId": 101,
-              "userId": 9, ...empdata
+              "userId": 9, ...empdata,...imageData
             }),
           })
             .then((res) => {
@@ -460,6 +466,39 @@ const EmpCreate = () => {
     }
   };
 
+  const [file, setFile] = useState();
+  function handleChange(e) {
+    console.log("Uploaded File Data");
+    const uploadedFile = e.target.files[0]
+    
+    // converting images to base64
+    let reader = new FileReader();
+    reader.onload = () => {
+      // printing base64 image
+      console.log(reader.result)
+      // image extension
+      console.log("image extension", uploadedFile.type.split("/")[1]);
+      setImageData({
+        isProfilePictureChange: true,
+        profilePicture: reader.result,
+        profilePictureNameExtension: uploadedFile.type.split("/")[1]
+    })
+    }
+    // setting the uploaded file to convert to base64 
+    reader.readAsDataURL(e.target.files[0])
+
+    setFile(URL.createObjectURL(e.target.files[0]));
+  }
+
+  const validateMobile = (e) => {
+    console.log(e.target.value.match(/[^\d]/))
+    if(e.target.value.match(/[^\d]/)){
+      e.target.nextSibling.innerHTML = "Number should only be consisted of digits"
+    }else{
+      contactnumberchange(e.target.value);
+    }
+  }
+
   return (
     <div>
       <div className="row mt-4">
@@ -489,7 +528,7 @@ const EmpCreate = () => {
                 <div className="row">
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>First Name <sup style={{color: "red"}}>*</sup></label>
+                      <label>First Name <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_first_name"
                         placeholder="Enter FirstName"
@@ -507,7 +546,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>Last Name <sup style={{color: "red"}}>*</sup></label>
+                      <label>Last Name <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_last_name"
                         placeholder="Enter LastName"
@@ -525,7 +564,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-3">
                     <div className="form-group">
-                      <label>Title <sup style={{color: "red"}}>*</sup></label>
+                      <label>Title <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_title"
                         onChange={(e) => titlechange(parseInt(e.target.value))}
@@ -542,7 +581,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-3">
                     <div className="form-group">
-                      <label>Gender <sup style={{color: "red"}}>*</sup></label>
+                      <label>Gender <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_gender"
                         onChange={(e) => genderchange(parseInt(e.target.value))}
@@ -559,7 +598,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-3">
                     <div className="form-group">
-                      <label>NIC <sup style={{color: "red"}}>*</sup></label>
+                      <label>NIC <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_nic"
                         placeholder="Enter NIC number"
@@ -577,7 +616,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-3">
                     <div className="form-group">
-                      <label>Date of Birth <sup style={{color: "red"}}>*</sup></label>
+                      <label>Date of Birth <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_date_of_birth"
                         value={dateOfBirth}
@@ -591,15 +630,15 @@ const EmpCreate = () => {
 
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>Contact Number <sup style={{color: "red"}}>*</sup></label>
+                      <label>Contact Number <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_contact_number"
                         value={contactNumber}
-                        type="number"
+                        type="text"
                         placeholder="Ender the correct phone number"
                         minLength="10"
                         maxLength="10"
-                        onChange={(e) => contactnumberchange(e.target.value)}
+                        onChange={(e) => validateMobile(e)}
                         className="form-control"
                       />
                       <span
@@ -611,7 +650,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>Email <sup style={{color: "red"}}>*</sup></label>
+                      <label>Email <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_email"
                         placeholder="Enter Email"
@@ -625,7 +664,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-4">
                     <div className="form-group">
-                      <label>Department <sup style={{color: "red"}}>*</sup></label>
+                      <label>Department <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_department"
                         onChange={(e) => departmentchange(parseInt(e.target.value))}
@@ -645,7 +684,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-4">
                     <div className="form-group">
-                      <label>Designation <sup style={{color: "red"}}>*</sup></label>
+                      <label>Designation <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_designation"
                         onChange={(e) => designationchange(parseInt(e.target.value))}
@@ -665,7 +704,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-4">
                     <div className="form-group">
-                      <label>Nationality <sup style={{color: "red"}}>*</sup></label>
+                      <label>Nationality <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_nationality"
                         onChange={(e) => nationalitychange(parseInt(e.target.value))}
@@ -685,7 +724,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-12">
                     <div className="form-group">
-                      <label>Address <sup style={{color: "red"}}>*</sup></label>
+                      <label>Address <sup style={{ color: "red" }}>*</sup></label>
                       <input
                         id="id_input_fm_1_address"
                         placeholder="Enter Address"
@@ -702,7 +741,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>Country <sup style={{color: "red"}}>*</sup></label>
+                      <label>Country <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_country"
                         onChange={(e) => countrychange(parseInt(e.target.value))}
@@ -722,7 +761,7 @@ const EmpCreate = () => {
 
                   <div className="col-lg-6">
                     <div className="form-group">
-                      <label>City <sup style={{color: "red"}}>*</sup></label>
+                      <label>City <sup style={{ color: "red" }}>*</sup></label>
                       <select
                         id="id_input_fm_1_city"
                         onChange={(e) => citychange(parseInt(e.target.value))}
@@ -737,7 +776,7 @@ const EmpCreate = () => {
                     </div>
                   </div>
 
-                  <div className="col-lg-4">
+                  {/* <div className="col-lg-4">
                     <div className="form-group">
                       <label>Profile Picture</label>
                       <input
@@ -748,6 +787,22 @@ const EmpCreate = () => {
                         className="form-control"
                       />
                       <img src={profilePicture} alt={"Image"} width="300" height="300" text-align="left" style={{display:'block'}} />
+                      <span
+                        className="text-danger"
+                        id="errorMsg_profilePicture"
+                      ></span>
+                    </div>
+                  </div> */}
+
+
+                  <div className="col-lg-4">
+                    <div className="form-group">
+                      <label>Profile Picture</label>
+                      <input type="file"
+                        value={profilePicture}
+                        className="form-control"
+                        onChange={handleChange} />
+                      <img src={file} style={{ height: "200px", width: "200px" }} />
                       <span
                         className="text-danger"
                         id="errorMsg_profilePicture"
@@ -801,7 +856,7 @@ const EmpCreate = () => {
                         className="form-check-label"
                         for="id_input_fm_1_active"
                       >
-                        Active <sup style={{color: "red"}}>*</sup>
+                        Active <sup style={{ color: "red" }}>*</sup>
                       </label>
                       <span className="text-danger" id="errorMsg_active"></span>
                     </div>

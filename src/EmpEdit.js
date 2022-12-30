@@ -46,15 +46,18 @@ const EmpEdit = () => {
                 profilePictureNameExtensionchange(resp.profilePictureNameExtension);
                 descriptionchange(resp.description);
                 remarkschange(resp.remark);
+                setFile("https://pms.saprosolutions.com/image" + resp.profilePicturePath + `?id=2`)
             })
             .catch((err) => {
                 console.log(err.message);
             })
     }, []);
 
-
-
-
+    const [imageData, setImageData] = useState({
+        profilePicture: "",//base64,
+        isProfilePictureChange: false,//boolean
+        profilePictureNameExtension: ""//image ext,
+    })
 
     const [bpartnerId, idchange] = useState(0);
     const [firstName, firstnamechange] = useState("");
@@ -260,21 +263,17 @@ const EmpEdit = () => {
             address,
             countryId,
             cityId,
-            profilePicture,
-            isProfilePictureChange,
-            profilePictureNameExtension,
             description,
             remark,
             isActive,
-        };
-
+        }
 
 
         fetch("http://45.32.99.72:8087/assignmentBE/checkEmployeeExist", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
-                "clientId": 1,
+                "clientId": 101,
                 "bpartnerId": parseInt(empdata.bpartnerId),
                 "nicNo": empdata.nicNo
             }),
@@ -294,7 +293,7 @@ const EmpEdit = () => {
                     body: JSON.stringify({
                         "clientId": 101,
                         "orgId": 101,
-                        "userId": 9, ...empdata
+                        "userId": 9, ...empdata,...imageData
                     }),
                 })
                     .then((res) => {
@@ -365,6 +364,41 @@ const EmpEdit = () => {
         date.getDate()
     ];
     console.log(dateValues)
+
+
+    const [file, setFile] = useState();
+    function handleChange(e) {
+        console.log("Uploaded File Data");
+        console.log(e.target.files[0].type);
+
+        // converting images to base64
+        let reader = new FileReader();
+        reader.onload = () => {
+            // printing base64 image
+            console.log(reader.result)
+            // image extension
+            console.log("image extension", e.target.files[0].type.split("/")[1]);
+            setImageData({
+                isProfilePictureChange: true,
+                profilePicture: reader.result,
+                profilePictureNameExtension: e.target.files[0].type.split("/")[1]
+            })
+        }
+        // setting the uploaded file to convert to base64 
+        reader.readAsDataURL(e.target.files[0])
+
+        setFile(URL.createObjectURL(e.target.files[0]));
+    }
+
+    const validateMobile = (e) => {
+        console.log(e.target.value.match(/[^\d]/))
+        if(e.target.value.match(/[^\d]/)){
+          e.target.nextSibling.innerHTML = "Number should only be consisted of digits"
+        }else{
+          contactnumberchange(e.target.value);
+        }
+      }
+
     return (
         <div>
 
@@ -498,11 +532,11 @@ const EmpEdit = () => {
                                             <input
                                                 id="id_input_fm_1_contact_number"
                                                 value={contactNumber}
-                                                type="number"
+                                                type="text"
                                                 placeholder="Ender the correct phone number"
                                                 minLength="10"
                                                 maxLength="10"
-                                                onChange={(e) => contactnumberchange(e.target.value)}
+                                                onChange={(e) => validateMobile(e)}
                                                 className="form-control"
                                             />
                                             <span
@@ -647,7 +681,7 @@ const EmpEdit = () => {
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-4">
+                                    {/* <div className="col-lg-4">
                                         <div className="form-group">
                                             <label>Profile Picture</label>
                                             <input
@@ -663,7 +697,23 @@ const EmpEdit = () => {
                                                 id="errorMsg_profilePicture"
                                             ></span>
                                         </div>
+                                    </div> */}
+
+                                    <div className="col-lg-4">
+                                        <div className="form-group">
+                                            <label>Profile Picture</label>
+                                            <input type="file"
+                                                value={profilePicture}
+                                                className="form-control"
+                                                onChange={handleChange} />
+                                            <img src={file} style={{ height: "200px", width: "200px" }} />
+                                            <span
+                                                className="text-danger"
+                                                id="errorMsg_profilePicture"
+                                            ></span>
+                                        </div>
                                     </div>
+
 
                                     <div className="col-lg-8">
                                         <div className="form-group">
